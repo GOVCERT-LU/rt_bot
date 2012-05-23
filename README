@@ -1,5 +1,12 @@
 This is a simple request tracker bot making use of the RT REST API.
 
+
+Dependencies:
+ - python (tested with v2.6)
+ - wokkel (tested with v0.7)
+ - python-rtkit
+ - twisted
+
 Setup:
  - Copy the file bot.conf.sample to bot.conf
  - Edit all properties in bot.conf
