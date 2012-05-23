@@ -1,0 +1,4 @@
+*.pyc
+python-rtkit
+wokkel*
+bot.conf
