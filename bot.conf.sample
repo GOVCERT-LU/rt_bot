@@ -3,6 +3,7 @@ my_jid=<login>@<jabberserver>
 my_secret=<password>
 my_nick=rt_bot
 room_jid=<roomid>@<jabberserver>
+room_password=<password>
 
 [RT]
 url=<request-tracker-url>
