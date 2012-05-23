@@ -1,0 +1,16 @@
+This is a simple request tracker bot making use of the RT REST API.
+
+Setup:
+ - Copy the file bot.conf.sample to bot.conf
+ - Edit all properties in bot.conf
+ - Launch the bot with ./run_me.sh
+
+Using the bot:
+ The bot will joing the specified room.
+ In order to interact with it, write its name followed by a space and
+ a command.
+ e.g.
+ rt_bot help
+
+ Calling the help function will explain what the bot can do and what
+ functions it supports.
