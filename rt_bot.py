@@ -23,10 +23,7 @@ from twisted.words.protocols.jabber.jid import JID
 from wokkel.client import XMPPClient
 from wokkel.muc import MUCClient
 from base_bot import BaseMUCBot
-import dns.resolver
 import re
-import urllib2
-import simplejson
 import ConfigParser
 
 from rtkit.resource import RTResource
