@@ -10,10 +10,12 @@ import ConfigParser
 
 
 class BaseMUCBot(MUCClient):
-  def __init__(self, roomJID, nick):
+  def __init__(self, roomJID, nick, roomPASSWORD):
     MUCClient.__init__(self)
     self.roomJID = roomJID
     self.nick = nick
+    self.roomPASSWORD = roomPASSWORD
+
 
   def connectionInitialized(self):
     """
@@ -29,6 +31,8 @@ class BaseMUCBot(MUCClient):
     required settings using L{configure}, possibly after presenting it to
     an end-user.
     """
+    self.join(self.roomJID, self.nick, password=self.roomPASSWORD)
+
     def joinedRoom(room):
       if room.locked:
         # Just accept the default configuration. 

@@ -42,8 +42,8 @@ class NoResponse(Exception):
 
 
 class RTBot(BaseMUCBot):
-  def __init__(self, roomJID, nick, rt_url, rt_user, rt_pwd):
-    BaseMUCBot.__init__(self, roomJID, nick)
+  def __init__(self, roomJID, nick, rt_url, rt_user, rt_pwd, roomPASSWORD):
+    BaseMUCBot.__init__(self, roomJID, nick, roomPASSWORD)
     self.resource = RTResource(rt_url + 'REST/1.0/', rt_user, rt_pwd, CookieAuthenticator)
     self.rt_url = rt_url
 
@@ -192,6 +192,8 @@ config.read('bot.conf')
 
 myJID = JID(config.get('Connection', 'my_jid'))
 roomJID = JID(config.get('Connection', 'room_jid'))
+roomPASSWORD = config.get('Connection', 'room_password')
+
 my_nick = config.get('Connection', 'my_nick')
 my_secret = config.get('Connection', 'my_secret')
 
@@ -210,5 +212,5 @@ client = XMPPClient(myJID, my_secret)
 client.logTraffic = LOG_TRAFFIC
 client.setServiceParent(application)
 
-mucHandler = RTBot(roomJID, my_nick, rt_url, rt_user, rt_pwd)
+mucHandler = RTBot(roomJID, my_nick, rt_url, rt_user, rt_pwd, roomPASSWORD)
 mucHandler.setHandlerParent(client)
