@@ -136,7 +136,7 @@ class RTBot(BaseMUCBot):
             t_title = t[1]
             ret += 'Ticket#: ' + t_id + '\n'
             ret += 'URL: ' + t_display + '\n'
-            ret += 'Title: ' + t_title + '\n'
+            ret += 'Title: ' + unicode(t_title, errors='replace') + '\n'
       else:
         raise NoResponse('Nothing found!')
     except RTResourceError as e:
@@ -144,7 +144,7 @@ class RTBot(BaseMUCBot):
       logger.error(e.response.status)
       logger.error(e.response.parsed)
 
-    return unicode(ret, 'utf-8')
+    return ret
 
   def rtticket(self, ticket_id):
     ret = '\n'
