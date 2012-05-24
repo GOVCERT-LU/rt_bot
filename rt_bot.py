@@ -42,10 +42,15 @@ class NoResponse(Exception):
 
 
 class RTBot(BaseMUCBot):
-  def __init__(self, roomJID, nick, rt_url, rt_user, rt_pwd, roomPASSWORD):
+  def __init__(self, roomJID, nick, rt_url, rt_user, rt_pwd, roomPASSWORD, rt_display_url=None):
     BaseMUCBot.__init__(self, roomJID, nick, roomPASSWORD)
     self.resource = RTResource(rt_url + 'REST/1.0/', rt_user, rt_pwd, CookieAuthenticator)
     self.rt_url = rt_url
+
+    if rt_display_url is None:
+	self.rt_display_url = rt_url
+    else:
+	self.rt_display_url = rt_display_url
 
   def handleGroupChat(self, room, user, message):
     if self.nick in message.body:
@@ -132,7 +137,7 @@ class RTBot(BaseMUCBot):
 
             logger.info(t)
             t_id = t[0]
-            t_display = self.rt_url + 'Ticket/Display.html?id=' + t_id
+            t_display = self.rt_display_url + 'Ticket/Display.html?id=' + t_id
             t_title = t[1]
             ret += 'Ticket#: ' + t_id + '\n'
             ret += 'URL: ' + t_display + '\n'
@@ -198,6 +203,7 @@ my_nick = config.get('Connection', 'my_nick')
 my_secret = config.get('Connection', 'my_secret')
 
 rt_url = config.get('RT', 'url')
+rt_display_url = config.get('RT','display_url')
 rt_user = config.get('RT', 'user')
 rt_pwd = config.get('RT', 'pwd')
 rt_default_queue = config.get('RT','default_queue')
@@ -212,5 +218,5 @@ client = XMPPClient(myJID, my_secret)
 client.logTraffic = LOG_TRAFFIC
 client.setServiceParent(application)
 
-mucHandler = RTBot(roomJID, my_nick, rt_url, rt_user, rt_pwd, roomPASSWORD)
+mucHandler = RTBot(roomJID, my_nick, rt_url, rt_user, rt_pwd, roomPASSWORD, rt_display_url)
 mucHandler.setHandlerParent(client)
