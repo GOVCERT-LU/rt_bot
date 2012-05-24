@@ -9,3 +9,4 @@ room_password=<password>
 url=<request-tracker-url>
 user=<rt-login>
 pwd=<rt-password>
+default_queue=general

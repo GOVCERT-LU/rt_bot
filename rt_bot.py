@@ -53,7 +53,7 @@ class RTBot(BaseMUCBot):
         body = u"%s: greetings stranger arrr arrr!" % (user.nick)
         self.groupChat(self.roomJID, body)
       elif 'open' in message.body:
-        queue = 'SOC'
+        queue = rt_default_queue
 
         m = re.search(r'open\s([^\s]+)', message.body)
         if m:
@@ -109,7 +109,7 @@ class RTBot(BaseMUCBot):
       elif 'help' in message.body:
         self.groupChat(self.roomJID, 'Usage:')
         self.groupChat(self.roomJID, 'open <queue name>  -  display all unassigned open and new tickets')
-        self.groupChat(self.roomJID, '                                         queue name defaults to SOC')
+        self.groupChat(self.roomJID, '                                         queue name defaults to '+rt_default_queue)
         self.groupChat(self.roomJID, 'search <subject>        -  search for a subject')
         self.groupChat(self.roomJID, 'ticket <ticket-id>         -  display ticket information')
 
@@ -200,7 +200,7 @@ my_secret = config.get('Connection', 'my_secret')
 rt_url = config.get('RT', 'url')
 rt_user = config.get('RT', 'user')
 rt_pwd = config.get('RT', 'pwd')
-
+rt_default_queue = config.get('RT','default_queue')
 
 LOG_TRAFFIC = False
 #LOG_TRAFFIC = True
