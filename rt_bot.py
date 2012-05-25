@@ -42,10 +42,11 @@ class NoResponse(Exception):
 
 
 class RTBot(BaseMUCBot):
-  def __init__(self, roomJID, nick, rt_url, rt_user, rt_pwd, roomPASSWORD, rt_display_url=None):
+  def __init__(self, roomJID, nick, rt_url, rt_user, rt_pwd, roomPASSWORD, rt_display_url=None, output_format="extended"):
     BaseMUCBot.__init__(self, roomJID, nick, roomPASSWORD)
     self.resource = RTResource(rt_url + 'REST/1.0/', rt_user, rt_pwd, CookieAuthenticator)
     self.rt_url = rt_url
+    self.output_format = output_format
 
     if rt_display_url is None:
 	self.rt_display_url = rt_url
@@ -120,7 +121,8 @@ class RTBot(BaseMUCBot):
 
   def rtquery(self, query, prepend_text=''):
     ret = '\n'
-    ret += prepend_text
+    if self.output_format == "extended":
+	ret += prepend_text
 
     try:
       response = self.resource.get(path='search/ticket?query=' + query)
@@ -130,7 +132,7 @@ class RTBot(BaseMUCBot):
 
         for r in response.parsed:
           for t in r:
-            if not first:
+            if not first and self.output_format == "extended":
               ret += '\n'
             else:
               first = False
@@ -138,10 +140,14 @@ class RTBot(BaseMUCBot):
             logger.info(t)
             t_id = t[0]
             t_display = self.rt_display_url + 'Ticket/Display.html?id=' + t_id
-            t_title = t[1]
-            ret += 'Ticket#: ' + t_id + '\n'
-            ret += 'URL: ' + t_display + '\n'
-            ret += 'Title: ' + unicode(t_title, errors='replace') + '\n'
+            t_title = unicode(t[1], errors='replace')
+            if self.output_format == "extended":
+                ret += 'Ticket#: ' + t_id + '\n'
+                ret += 'URL: ' + t_display + '\n'
+                ret += 'Title: ' + t_title + '\n'
+	    elif self.output_format == "compact":
+		ret += '#'+t_id+","+t_title+","+t_display+"\n"
+
       else:
         raise NoResponse('Nothing found!')
     except RTResourceError as e:
@@ -191,6 +197,9 @@ class RTBot(BaseMUCBot):
     return ret
 
 
+# Output format - extended, compact
+output_format = "extended"
+
 # Configuration parameters
 config = ConfigParser.RawConfigParser()
 config.read('bot.conf')
@@ -218,5 +227,5 @@ client = XMPPClient(myJID, my_secret)
 client.logTraffic = LOG_TRAFFIC
 client.setServiceParent(application)
 
-mucHandler = RTBot(roomJID, my_nick, rt_url, rt_user, rt_pwd, roomPASSWORD, rt_display_url)
+mucHandler = RTBot(roomJID, my_nick, rt_url, rt_user, rt_pwd, roomPASSWORD, rt_display_url, output_format)
 mucHandler.setHandlerParent(client)
