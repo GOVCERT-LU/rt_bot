@@ -157,7 +157,7 @@ class RTBot(BaseMUCBot):
 
         for r in response.parsed:
           for t in r:
-            rsp_dict[t[0]] = t[1]
+            rsp_dict[t[0]] = unicode(t[1], 'utf-8')
 
         ret += 'Ticket#: ' + ticket_id + '\n'
         t_display = self.rt_url + 'Ticket/Display.html?id=' + ticket_id
