@@ -16,7 +16,6 @@ class BaseMUCBot(MUCClient):
     self.nick = nick
     self.roomPASSWORD = roomPASSWORD
 
-
   def connectionInitialized(self):
     """
     Once authorized, join the room.
