@@ -7,5 +7,7 @@ room_password=<password>
 
 [RT]
 url=<request-tracker-url>
+display_url=<request-tracker-url-to-display>
 user=<rt-login>
 pwd=<rt-password>
+default_queue=general

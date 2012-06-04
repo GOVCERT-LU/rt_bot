@@ -42,10 +42,16 @@ class NoResponse(Exception):
 
 
 class RTBot(BaseMUCBot):
-  def __init__(self, roomJID, nick, rt_url, rt_user, rt_pwd, roomPASSWORD):
+  def __init__(self, roomJID, nick, rt_url, rt_user, rt_pwd, roomPASSWORD, rt_display_url=None, output_format="extended"):
     BaseMUCBot.__init__(self, roomJID, nick, roomPASSWORD)
     self.resource = RTResource(rt_url + 'REST/1.0/', rt_user, rt_pwd, CookieAuthenticator)
     self.rt_url = rt_url
+    self.output_format = output_format
+
+    if rt_display_url is None:
+	self.rt_display_url = rt_url
+    else:
+	self.rt_display_url = rt_display_url
 
   def handleGroupChat(self, room, user, message):
     if self.nick in message.body:
@@ -53,7 +59,7 @@ class RTBot(BaseMUCBot):
         body = u"%s: greetings stranger arrr arrr!" % (user.nick)
         self.groupChat(self.roomJID, body)
       elif 'open' in message.body:
-        queue = 'SOC'
+        queue = rt_default_queue
 
         m = re.search(r'open\s([^\s]+)', message.body)
         if m:
@@ -109,13 +115,14 @@ class RTBot(BaseMUCBot):
       elif 'help' in message.body:
         self.groupChat(self.roomJID, 'Usage:')
         self.groupChat(self.roomJID, 'open <queue name>  -  display all unassigned open and new tickets')
-        self.groupChat(self.roomJID, '                                         queue name defaults to SOC')
+        self.groupChat(self.roomJID, '                                         queue name defaults to '+rt_default_queue)
         self.groupChat(self.roomJID, 'search <subject>        -  search for a subject')
         self.groupChat(self.roomJID, 'ticket <ticket-id>         -  display ticket information')
 
   def rtquery(self, query, prepend_text=''):
     ret = '\n'
-    ret += prepend_text
+    if self.output_format == "extended":
+	ret += prepend_text
 
     try:
       response = self.resource.get(path='search/ticket?query=' + query)
@@ -125,18 +132,22 @@ class RTBot(BaseMUCBot):
 
         for r in response.parsed:
           for t in r:
-            if not first:
+            if not first and self.output_format == "extended":
               ret += '\n'
             else:
               first = False
 
             logger.info(t)
             t_id = t[0]
-            t_display = self.rt_url + 'Ticket/Display.html?id=' + t_id
-            t_title = t[1]
-            ret += 'Ticket#: ' + t_id + '\n'
-            ret += 'URL: ' + t_display + '\n'
-            ret += 'Title: ' + t_title + '\n'
+            t_display = self.rt_display_url + 'Ticket/Display.html?id=' + t_id
+            t_title = unicode(t[1], errors='replace')
+            if self.output_format == "extended":
+                ret += 'Ticket#: ' + t_id + '\n'
+                ret += 'URL: ' + t_display + '\n'
+                ret += 'Title: ' + t_title + '\n'
+	    elif self.output_format == "compact":
+		ret += '#'+t_id+","+t_title+","+t_display+"\n"
+
       else:
         raise NoResponse('Nothing found!')
     except RTResourceError as e:
@@ -144,7 +155,7 @@ class RTBot(BaseMUCBot):
       logger.error(e.response.status)
       logger.error(e.response.parsed)
 
-    return unicode(ret, 'utf-8')
+    return ret
 
   def rtticket(self, ticket_id):
     ret = '\n'
@@ -186,6 +197,9 @@ class RTBot(BaseMUCBot):
     return ret
 
 
+# Output format - extended, compact
+output_format = "extended"
+
 # Configuration parameters
 config = ConfigParser.RawConfigParser()
 config.read('bot.conf')
@@ -198,9 +212,10 @@ my_nick = config.get('Connection', 'my_nick')
 my_secret = config.get('Connection', 'my_secret')
 
 rt_url = config.get('RT', 'url')
+rt_display_url = config.get('RT','display_url')
 rt_user = config.get('RT', 'user')
 rt_pwd = config.get('RT', 'pwd')
-
+rt_default_queue = config.get('RT','default_queue')
 
 LOG_TRAFFIC = False
 #LOG_TRAFFIC = True
@@ -212,5 +227,5 @@ client = XMPPClient(myJID, my_secret)
 client.logTraffic = LOG_TRAFFIC
 client.setServiceParent(application)
 
-mucHandler = RTBot(roomJID, my_nick, rt_url, rt_user, rt_pwd, roomPASSWORD)
+mucHandler = RTBot(roomJID, my_nick, rt_url, rt_user, rt_pwd, roomPASSWORD, rt_display_url, output_format)
 mucHandler.setHandlerParent(client)
