@@ -5,16 +5,15 @@ from twisted.python import log
 from twisted.words.protocols.jabber.jid import JID
 from wokkel.client import XMPPClient
 from wokkel.muc import MUCClient
-import ConfigParser
 
 
 
 class BaseMUCBot(MUCClient):
-  def __init__(self, roomJID, nick, roomPASSWORD):
+  def __init__(self, roomJID, nick, roomPassword):
     MUCClient.__init__(self)
     self.roomJID = roomJID
     self.nick = nick
-    self.roomPASSWORD = roomPASSWORD
+    self.roomPassword = roomPassword
 
   def connectionInitialized(self):
     """
@@ -30,8 +29,6 @@ class BaseMUCBot(MUCClient):
     required settings using L{configure}, possibly after presenting it to
     an end-user.
     """
-    self.join(self.roomJID, self.nick, password=self.roomPASSWORD)
-
     def joinedRoom(room):
       if room.locked:
         # Just accept the default configuration. 
@@ -39,7 +36,7 @@ class BaseMUCBot(MUCClient):
 
     MUCClient.connectionInitialized(self)
 
-    d = self.join(self.roomJID, self.nick, password='test')
+    d = self.join(self.roomJID, self.nick, password=self.roomPassword)
     d.addCallback(joinedRoom)
     d.addCallback(lambda _: log.msg("Joined room"))
     d.addErrback(log.err, "Join failed")
