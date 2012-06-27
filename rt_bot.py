@@ -42,8 +42,8 @@ class NoResponse(Exception):
 
 
 class RTBot(BaseMUCBot):
-  def __init__(self, roomJID, nick, rt_url, rt_user, rt_pwd, roomPASSWORD, rt_display_url=None, output_format="extended"):
-    BaseMUCBot.__init__(self, roomJID, nick, roomPASSWORD)
+  def __init__(self, roomJID, nick, rt_url, rt_user, rt_pwd, roomPassword, rt_display_url=None, output_format="extended"):
+    BaseMUCBot.__init__(self, roomJID, nick, roomPassword)
     self.resource = RTResource(rt_url + 'REST/1.0/', rt_user, rt_pwd, CookieAuthenticator)
     self.rt_url = rt_url
     self.output_format = output_format
@@ -206,7 +206,7 @@ config.read('bot.conf')
 
 myJID = JID(config.get('Connection', 'my_jid'))
 roomJID = JID(config.get('Connection', 'room_jid'))
-roomPASSWORD = config.get('Connection', 'room_password')
+roomPassword = config.get('Connection', 'room_password')
 
 my_nick = config.get('Connection', 'my_nick')
 my_secret = config.get('Connection', 'my_secret')
@@ -227,5 +227,5 @@ client = XMPPClient(myJID, my_secret)
 client.logTraffic = LOG_TRAFFIC
 client.setServiceParent(application)
 
-mucHandler = RTBot(roomJID, my_nick, rt_url, rt_user, rt_pwd, roomPASSWORD, rt_display_url, output_format)
+mucHandler = RTBot(roomJID, my_nick, rt_url, rt_user, rt_pwd, roomPassword, rt_display_url, output_format)
 mucHandler.setHandlerParent(client)
